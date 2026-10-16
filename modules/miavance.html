@@ -1,0 +1,124 @@
+<div class="module-title">Mi Avance — Sellador</div>
+<div class="module-subtitle">Tu producción del mes.</div>
+
+<style>
+  .ma-kpis { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-bottom:12px; }
+  @media (min-width:768px){ .ma-kpis { grid-template-columns:repeat(3,1fr); } }
+  .ma-kpi { border:1px solid #b9b9b9; background:#fff; padding:10px 12px; border-radius:4px; }
+  .ma-kpi .lbl { font-size:11px; text-transform:uppercase; letter-spacing:.04em; color:#666; }
+  .ma-kpi .val { font-size:24px; font-weight:bold; line-height:1.2; margin-top:2px; }
+  .ma-kpi .sub { font-size:11px; color:#777; margin-top:2px; }
+  .ma-mes { display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:12px; }
+  .ma-mes button { min-width:34px; }
+  .ma-mes-label { font-size:16px; font-weight:bold; min-width:150px; text-align:center; text-transform:capitalize; }
+  .ma-chart { display:flex; align-items:flex-end; gap:2px; height:90px; padding:6px 4px 0; border:1px solid #b9b9b9; background:#fff; border-radius:4px; }
+  .ma-bar { flex:1; background:#2a5db0; min-height:2px; border-radius:2px 2px 0 0; position:relative; }
+  .ma-bar.vacio { background:#ddd; }
+  .ma-chart-eje { display:flex; justify-content:space-between; font-size:10px; color:#777; padding:2px 4px 0; margin-bottom:12px; }
+    .ma-scroll { max-height:340px; overflow:auto; border:1px solid #b9b9b9; }
+  .ma-scroll thead th { position:sticky; top:0; background:#e8e8e8; z-index:2; }
+  .ma-full-bar { display:flex; justify-content:flex-end; margin-top:6px; }
+  #mi-avance-tabla-wrap.ma-full { position:fixed; inset:0; z-index:9999; background:#fff; padding:12px; overflow:hidden; display:flex; flex-direction:column; }
+  #mi-avance-tabla-wrap.ma-full .ma-scroll { max-height:none; flex:1; }
+  #mi-avance-tabla-wrap .ma-full-cerrar { display:none; }
+  #mi-avance-tabla-wrap.ma-full .ma-full-cerrar { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-weight:bold; }
+</style>
+
+<div id="mi-avance-selector" class="quick-panel show">
+  <div class="quick-panel-header">
+    <span class="quick-panel-title">¿Quién eres?</span>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+    <div>
+      <label class="field-label">Selecciona tu nombre</label>
+      <select class="input-classic" id="mi-avance-select">
+        <option value="">— Selecciona —</option>
+        <option value="HECTOR">HECTOR</option>
+        <option value="MAURO">MAURO</option>
+        <option value="SAMIR">SAMIR</option>
+        <option value="NELSON">NELSON</option>
+        <option value="ERIKA">ERIKA</option>
+        <option value="GRACIELA">GRACIELA</option>
+        <option value="__otro__">Otro (escribir nombre)...</option>
+      </select>
+      <input class="input-classic" id="mi-avance-otro" placeholder="Escribe tu nombre" style="margin-top:6px; display:none;" />
+    </div>
+  </div>
+  <div class="flex justify-end gap-2 mt-3">
+    <button class="btn-classic btn-primary" id="mi-avance-confirmar">Ver mi avance</button>
+  </div>
+</div>
+
+<div id="mi-avance-panel" style="display:none;">
+  <div class="text-center py-1" style="margin-bottom:10px;">
+    Viendo avance de: <b id="mi-avance-nombre">—</b> —
+    <a id="mi-avance-cambiar" style="cursor:pointer; color:#2a5db0; text-decoration:underline;">cambiar</a>
+  </div>
+
+  <div class="ma-mes">
+    <button class="btn-classic" id="mi-avance-mes-prev">‹</button>
+    <div class="ma-mes-label" id="mi-avance-mes-label">—</div>
+    <button class="btn-classic" id="mi-avance-mes-next">›</button>
+    <button class="btn-classic" id="mi-avance-mes-hoy">Este mes</button>
+  </div>
+
+  <div class="ma-kpis">
+    <div class="ma-kpi">
+      <div class="lbl">Bolsas selladas</div>
+      <div class="val" id="mi-avance-total-bolsas">0</div>
+      <div class="sub">millares × 1000</div>
+    </div>
+    <div class="ma-kpi">
+      <div class="lbl">Kilos usados</div>
+      <div class="val" id="mi-avance-total-kg">0</div>
+      <div class="sub">peso manga − tuco</div>
+    </div>
+    <div class="ma-kpi">
+      <div class="lbl">Corridas</div>
+      <div class="val" id="mi-avance-total-corridas">0</div>
+      <div class="sub" id="mi-avance-prom">—</div>
+    </div>
+    <div class="ma-kpi">
+      <div class="lbl">Plástico del mes</div>
+      <div class="val" id="mi-avance-total-dif">—</div>
+      <div class="sub" id="mi-avance-total-dif-txt">—</div>
+    </div>
+    <div class="ma-kpi">
+      <div class="lbl">Merma (tuco)</div>
+      <div class="val" id="mi-avance-merma">—</div>
+      <div class="sub" id="mi-avance-merma-sub">—</div>
+    </div>
+    <div class="ma-kpi">
+      <div class="lbl">Última corrida</div>
+      <div class="val" id="mi-avance-ultima" style="font-size:15px; margin-top:8px;">—</div>
+      <div class="sub" id="mi-avance-ultima-sub">&nbsp;</div>
+    </div>
+  </div>
+
+  <div class="field-label" style="margin-bottom:4px;">Bolsas selladas por día</div>
+  <div class="ma-chart" id="mi-avance-chart"></div>
+  <div class="ma-chart-eje"><span>1</span><span id="mi-avance-chart-fin">30</span></div>
+
+    <div id="mi-avance-tabla-wrap">
+    <div class="ma-full-cerrar">
+      <span>Mis producciones — <span id="mi-avance-full-mes"></span></span>
+      <button class="btn-classic" id="mi-avance-full-cerrar">✕ Cerrar</button>
+    </div>
+  <div class="table-scroll ma-scroll">
+    <table class="data-grid" id="mi-avance-table">
+      <thead>
+        <tr>
+          <th>Fecha</th><th>ID Manga</th><th>Proveedor</th><th>Litros</th>
+          <th>Ancho</th><th>Largo</th><th>Espesor</th><th>Millares</th>
+          <th>Peso utilizado</th><th>Fórmula (kg)</th><th>Real (kg)</th>
+          <th>Diferencia (kg)</th><th>Estado</th>
+        </tr>
+      </thead>
+           <tbody id="mi-avance-tbody"><tr><td colspan="13">Cargando…</td></tr></tbody>
+    </table>
+  </div>
+    <div class="ma-full-bar">
+      <button class="btn-classic" id="mi-avance-full-abrir">⛶ Ver en pantalla completa</button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,167 @@
+<div class="module-title">Stock en tiempo real</div>
+<div class="module-subtitle">Busca un artículo y usa los botones de la fila para registrar ingresos o ventas al instante.</div>
+
+<!-- Barra de búsqueda + filtros -->
+<div class="search-bar">
+  <div class="search-input-wrap">
+    <span>🔍</span>
+    <input type="text" id="stock-search-input" placeholder="Buscar por ID o descripción... (ej. ART-00458, bolsas 55L)" />
+  </div>
+  <button class="btn-classic" id="btn-escanear" title="Escanear código de barras">📷 Escanear</button>
+  <select class="input-classic" id="stock-filter-almacen" style="width:150px;">
+  <option value="">Todos los almacenes</option>
+  <option value="Almacén 1">Almacén 1</option>
+  <option value="Almacén 2">Almacén 2</option>
+</select>
+<select class="input-classic" id="stock-filter-estado" style="width:150px;">
+  <option value="">Todos los estados</option>
+  <option value="Normal">Normal</option>
+  <option value="Bajo mínimo">Bajo mínimo</option>
+  <option value="Sin stock">Sin stock</option>
+  <option value="Sin ubicar">Sin ubicar</option>
+</select>
+  <button class="btn-classic btn-primary" id="btn-buscar-stock">Buscar</button>
+</div>
+<div class="adv-filters">
+  <div class="adv-filter-field">
+    <label class="field-label">Cliente</label>
+    <input type="text" id="filter-cliente" class="input-classic" placeholder="Nombre del cliente" />
+  </div>
+  <div class="adv-filter-field">
+    <label class="field-label">Medida (Litraje)</label>
+    <input type="text" id="filter-medida" class="input-classic" placeholder="Ej. 140" />
+  </div>
+  <div class="adv-filter-field">
+    <label class="field-label">Ubicación</label>
+    <input type="text" id="filter-ubicacion" class="input-classic" placeholder="Ej. F1-M2-A-N2" />
+  </div>
+  <div class="adv-filter-field">
+    <label class="field-label">Color</label>
+    <input type="text" id="filter-color" class="input-classic" placeholder="Ej. Negro" />
+  </div>
+  <div class="adv-filter-field">
+    <label class="field-label">Ancho</label>
+    <input type="text" id="filter-ancho" class="input-classic" placeholder="Ej. 33" />
+  </div>
+  <div class="adv-filter-field">
+    <label class="field-label">Largo</label>
+    <input type="text" id="filter-largo" class="input-classic" placeholder="Ej. 41" />
+  </div>
+  <div class="adv-filter-field">
+    <label class="field-label">Espesor</label>
+    <input type="text" id="filter-espesor" class="input-classic" placeholder="Ej. 0.9" />
+  </div>
+  <div class="adv-filter-field" style="justify-content:flex-end; display:flex; align-items:flex-end;">
+    <button class="btn-classic" id="btn-limpiar-filtros" style="width:100%;">✕ Limpiar filtros</button>
+  </div>
+</div>
+<div class="quick-panel" id="scanner-panel">
+  <div class="quick-panel-header">
+    <span class="quick-panel-title">Escanear código de barras</span>
+    <span class="quick-panel-close" id="scanner-panel-close">✕ Cerrar</span>
+  </div>
+  <div id="scanner-reader" style="width:100%; max-width:400px; margin:0 auto;"></div>
+  <div class="field-help" style="text-align:center; margin-top:8px;">Apunta la cámara al código de barras del producto.</div>
+</div>
+<div class="table-with-sidebar">
+  <div class="table-col">
+    <div class="table-scroll">
+  <div class="table-scroll-x">
+  <table class="data-grid" id="stock-table">
+        <thead>
+         <tr><th>ID</th><th>Descripción</th><th>Litraje</th><th>Color<th>C/F</th></th><th>Ancho</th><th>Largo</th><th>Espesor</th><th>Empresa</th><th>Cliente</th><th>Ubicación</th><th>Almacén</th><th>Disponible</th><th>Estado</th><th style="width:70px;">Acciones</th></tr>
+        </thead>
+        <tbody id="stock-tbody">
+          <tr><td colspan="6">Cargando…</td></tr>
+        </tbody>
+    </table>
+  </div>
+  </div>
+
+    <!-- Panel de acción rápida (ingreso / venta) sin recargar la página -->
+   <!-- Panel de acción rápida (ingreso / venta) sin recargar la página -->
+<div class="quick-panel" id="quick-panel">
+    <div class="quick-panel-header">
+        <span class="quick-panel-title">Registrar movimiento — <span id="quick-panel-item">-</span></span>
+        <span class="quick-panel-close" id="quick-panel-close">✕ Cerrar</span>
+    </div>
+    <div class="flex items-end gap-3 quick-panel-row">
+        <div style="width:140px;" class="quick-panel-field">
+            <label class="field-label">Cantidad</label>
+            <input type="number" id="quick-panel-qty" class="input-classic" value="10" min="1" />
+        </div>
+        <div style="width:200px;" class="quick-panel-field">
+            <label class="field-label">Motivo</label>
+            <select class="input-classic" id="quick-panel-motivo"></select>
+        </div>
+        <button class="btn-classic btn-primary quick-panel-field" id="quick-panel-confirm">✓ Confirmar</button>
+    </div>
+</div>
+
+<!-- Segundo panel integrado correctamente al mismo nivel -->
+<div class="quick-panel" id="location-panel">
+  <div class="quick-panel-header">
+    <span class="quick-panel-title">Asignar ubicación — <span id="location-panel-item">—</span></span>
+    <span class="quick-panel-close" id="location-panel-close">✕ Cerrar</span>
+  </div>
+
+  <div class="quick-panel-row" style="margin-bottom:8px;">
+    <div class="quick-panel-field" style="width:170px;">
+      <label class="field-label">Almacén</label>
+      <select class="input-classic" id="loc-almacen">
+        <option value="Almacén 1">Almacén 1</option>
+        <option value="Almacén 2">Almacén 2</option>
+      </select>
+    </div>
+  </div>
+
+  <div id="loc-fields-almacen1" class="flex items-end gap-3 quick-panel-row" style="display:none;">
+    <div class="quick-panel-field" style="width:100px;">
+      <label class="field-label">Mueble</label>
+      <select class="input-classic" id="loc-mueble">
+        <option>R1</option><option>R2</option><option>E1</option>
+      </select>
+    </div>
+    <div class="quick-panel-field" style="width:80px;">
+      <label class="field-label">Nivel</label>
+      <select class="input-classic" id="loc-nivel-a1">
+        <option>N1</option><option>N2</option><option>N3</option>
+      </select>
+    </div>
+  </div>
+
+  <div id="loc-fields-almacen2" class="flex items-end gap-3 quick-panel-row">
+    <div class="quick-panel-field" style="width:85px;">
+      <label class="field-label">Fila</label>
+      <select class="input-classic" id="loc-fila"><option>F1</option><option>F2</option><option>F3</option></select>
+    </div>
+    <div class="quick-panel-field" style="width:85px;">
+      <label class="field-label">Módulo</label>
+      <select class="input-classic" id="loc-modulo"><option>M1</option><option>M2</option><option>M3</option><option>M4</option></select>
+    </div>
+    <div class="quick-panel-field" style="width:75px;">
+      <label class="field-label">Lado</label>
+      <select class="input-classic" id="loc-lado"><option>A</option><option>B</option></select>
+    </div>
+    <div class="quick-panel-field" style="width:75px;">
+      <label class="field-label">Nivel</label>
+      <select class="input-classic" id="loc-nivel"><option>N1</option><option>N2</option><option>N3</option></select>
+    </div>
+  </div>
+
+  <div class="flex items-end gap-3 quick-panel-row">
+    <div class="quick-panel-field" style="width:110px;">
+      <label class="field-label">Stock inicial</label>
+      <input type="number" id="loc-stock-inicial" class="input-classic" value="0" min="0" />
+    </div>
+    <button class="btn-classic btn-primary quick-panel-field" id="location-panel-confirm">✔ Confirmar</button>
+  </div>
+</div>
+</div>
+  <div class="metrics-sidebar">
+    <div class="metric-card"><div class="metric-label">Disponible</div><div class="metric-value" id="metric-disponible">—</div></div>
+    <div class="metric-card"><div class="metric-label">Bajo mínimo</div><div class="metric-value" style="color:var(--warn);" id="metric-bajo-minimo">—</div></div>
+    <div class="metric-card"><div class="metric-label">Sin stock</div><div class="metric-value" style="color:var(--danger);" id="metric-sin-stock">—</div></div>
+    <div class="metric-card"><div class="metric-label">Sin ubicar</div><div class="metric-value" style="color:#888;" id="metric-sin-ubicar">—</div></div>
+  </div>
+</div>
